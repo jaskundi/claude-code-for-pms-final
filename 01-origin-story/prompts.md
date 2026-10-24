@@ -23,7 +23,23 @@ prompt library built from your own questions.
 ---
 
 ### 1.
+What's contradictory or missing, not just in the company documents, but across Rook's wiki, its database, and the files in my repo?
 
 ### 2.
+What went wrong with 4.2?
 
 ### 3.
+What are the first things as a new PM that I should look at?
+
+### 4.
+Let's work on the items for 'This Week' Can you look into the 4.2 findings with Wen and confirm hem with him?
+
+Then we'll Brief Helen, before anyone touches the code.
+
+Ask Ravi for the real numbers does he have them?
+
+Speak to Nadia and the handlers, what are the tickets breakdown? 
+
+For this below what should we do, keep them waiting or do we have answers from all the above to move forward?
+
+Dot, Kip and the handlers for Farlight and The Undertow are still waiting for answers. Kip is still telling Meteor Mite to “hang in there.”
