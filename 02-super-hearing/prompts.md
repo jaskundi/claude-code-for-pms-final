@@ -15,7 +15,26 @@ prompt library built from your own questions.
 ---
 
 ### 1.
+Can you explain to me what the actual product is that I'd be working on?
 
 ### 2.
+can you explain the below:
+
+6. Saved filters reset without warning: 1 of 4 (Ambrose). He likes the 4.2 change, but it has reset on him twice.
+
+* Ambrose: “I’d rather it warned me the filter had reset than simply reset it.”
 
 ### 3.
+After version 4.2 launched what changed from the tickets?
+
+### 4.
+Essentially the issue created was routing complaints, more so then any other other which affected the product?
+
+### 5.
+At first we determined the issue created was routing complaints, more so then any other other which affected the product, however now looking at the tickets, this has changed?
+
+### 6.
+Did the interface for callout change when 4.2 rolled out?
+
+### 7.
+So what can be the issue?
