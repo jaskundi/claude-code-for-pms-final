@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiet Responder Prototype</title>
+<style>
+  :root {
+    --bg: #f5f4f0; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a66;
+    --line: #e2e0da; --accent: #2f5bd3; --accent-ink: #ffffff;
+    --warn-bg: #fff4dc; --warn-line: #e6b34a; --warn-ink: #7a5300;
+    --ok-bg: #e5f5ea; --ok-line: #5bb37a; --ok-ink: #1f6b3a;
+    --phone: #16161a; --screen: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141413; --panel: #1f1f1d; --ink: #f0efea; --muted: #a3a29c;
+      --line: #34332f; --accent: #7d9cff; --accent-ink: #10131c;
+      --warn-bg: #3a2e12; --warn-line: #b88a2c; --warn-ink: #f3d38a;
+      --ok-bg: #16301f; --ok-line: #3f8f5a; --ok-ink: #a6e0b8;
+      --phone: #000000; --screen: #1f1f1d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 20px 16px 40px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  .story { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 18px; }
+  .story .step { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+  .story h2 { font-size: 17px; margin: 2px 0 4px; }
+  .story p { margin: 0; }
+  .nav { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  button { font: inherit; border-radius: 8px; padding: 8px 14px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  button:disabled { opacity: .4; cursor: default; }
+  .stage { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } .phone { margin: 0 auto; } }
+  .label { font-size: 12px; color: var(--muted); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .04em; }
+
+  /* Handler console */
+  .console { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .console header { padding: 10px 14px; border-bottom: 1px solid var(--line); display: flex;
+    justify-content: space-between; font-weight: 600; }
+  .console header span { font-weight: 400; color: var(--muted); }
+  .card { margin: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .card .row { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .name { font-weight: 600; font-size: 16px; }
+  .pill { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--ok-bg);
+    color: var(--ok-ink); border: 1px solid var(--ok-line); }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .alert { margin-top: 10px; border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+  .alert.warn { background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); }
+  .alert.ok { background: var(--ok-bg); border: 1px solid var(--ok-line); color: var(--ok-ink); }
+  .alert button { margin-top: 8px; }
+  .log { margin: 0 14px 14px; font-size: 13px; color: var(--muted); }
+  .log li { margin: 2px 0; }
+
+  /* Responder phone */
+  .phone { width: 280px; background: var(--phone); border-radius: 32px; padding: 14px; }
+  .screen { background: var(--screen); border-radius: 22px; min-height: 440px; padding: 18px 16px;
+    display: flex; flex-direction: column; }
+  .screen .top { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+  .screen .body { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; gap: 10px; }
+  .big { font-size: 20px; font-weight: 600; }
+  .timer { font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+  .small { font-size: 13px; color: var(--muted); }
+  .note { border-radius: 10px; padding: 12px; text-align: left; font-size: 14px; }
+  .hide { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>No one goes quiet without anyone knowing</h1>
+  <p class="sub">Click-through for Helen · Aunt Dot's console on the left, Vesper's phone on the right.
+    Fictional prototype; wording and thresholds are placeholders for Sofia.</p>
+
+  <div class="story">
+    <div class="step" id="stepNum"></div>
+    <h2 id="stepTitle"></h2>
+    <p id="stepText"></p>
+    <div class="nav">
+      <button id="back">← Back</button>
+      <button id="next" class="primary">Next →</button>
+      <button id="restart">Start over</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div>
+      <p class="label">Handler console · Aunt Dot</p>
+      <div class="console">
+        <header>My responders <span id="clock"></span></header>
+        <div class="card">
+          <div class="row">
+            <div class="name">Vesper</div>
+            <div class="pill">Available</div>
+          </div>
+          <div class="meta" id="lastPing"></div>
+          <div class="alert warn hide" id="quietAlert">
+            <strong>Vesper has gone quiet.</strong> Not asked in 5 days. They usually get about 12 pings a week.
+            <div><button class="primary" id="sendNext">Send Vesper the next suitable callout</button></div>
+          </div>
+          <div class="alert ok hide" id="queuedAlert">
+            Done. Vesper will be asked first on the next callout they're suited for.
+          </div>
+          <div class="alert warn hide" id="missAlert">
+            Vesper's ping timed out after 60 seconds. <strong>Not counted against them.</strong>
+            They'll be offered the next suitable callout too.
+          </div>
+          <div class="alert ok hide" id="takenAlert">
+            <strong>Vesper took a callout just now.</strong> Back to normal. Warning cleared.
+          </div>
+        </div>
+        <ul class="log" id="log"></ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="label">Responder phone · Vesper</p>
+      <div class="phone"><div class="screen">
+        <div class="top"><span>Rook Dispatch</span><span id="phoneClock"></span></div>
+        <div class="body" id="phoneIdle">
+          <div class="big">No callouts</div>
+          <div class="small" id="idleText">You're available.</div>
+        </div>
+        <div class="body hide" id="phonePing">
+          <div class="small">New callout for you</div>
+          <div class="big">Fire, third floor flat</div>
+          <div class="small">About 6 minutes away</div>
+          <div class="timer" id="timer">60</div>
+          <div class="bar"><i id="bar" style="width:100%"></i></div>
+          <div class="small" id="timerHint"></div>
+          <button class="primary" id="take">Take it</button>
+        </div>
+        <div class="body hide" id="phoneMissed">
+          <div class="note alert warn">
+            <strong>This one moved on after 60 seconds.</strong><br>
+            A timeout doesn't count against you. We'll offer you the next one that suits you.
+          </div>
+        </div>
+        <div class="body hide" id="phoneTaken">
+          <div class="big">You're on it</div>
+          <div class="small">Directions and details are on the next screen.</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  { title: "Today: nothing looks wrong",
+    text: "This is Dot's console right now. Vesper is 'Available', so Dot assumes all is well. But the system stopped asking Vesper weeks ago, and nothing tells her. Vesper's phone is just silent.",
+    console: [], phone: "idle", idle: "You're available.", last: "Last ping: 1 Sep · Last callout taken: 17 Aug" },
+  { title: "With the change: Dot gets a heads-up",
+    text: "After 5 days with no ping, Vesper's card shows a plain warning and one thing Dot can do about it. Click the button on Dot's console.",
+    console: ["quietAlert"], phone: "idle", idle: "You're available.", last: "Last ping: 5 days ago" },
+  { title: "Dot asks for Vesper to be tried",
+    text: "The next callout Vesper is suited for goes to them first, instead of the top of the list. Click Next to see it arrive.",
+    console: ["queuedAlert"], phone: "idle", idle: "You're available.", last: "Last ping: 5 days ago", log: "Dot asked for Vesper to get the next suitable callout" },
+  { title: "A ping arrives, and Vesper's on the stairs",
+    text: "The ping waits 60 seconds. This demo runs the clock fast. Let it run out to see what a timeout looks like now, or tap 'Take it'.",
+    console: ["queuedAlert"], phone: "ping", speed: 100, last: "Last ping: just now" },
+  { title: "A timeout is not a 'no'",
+    text: "Vesper sees why the ping vanished, and that it didn't count against them. Dot sees it too. Under today's rules this would have cost Vesper 0.12, the same as refusing.",
+    console: ["missAlert"], phone: "missed", last: "Last ping: just now (timed out)", log: "Ping timed out after 60 s · not counted against Vesper" },
+  { title: "The next suitable callout comes to Vesper",
+    text: "This time the clock runs at real speed. Tap 'Take it'.",
+    console: ["missAlert"], phone: "ping", speed: 1000, last: "Last ping: just now" },
+  { title: "Vesper is back",
+    text: "Dot's warning clears on its own. Vesper took a callout, and the score goes back up. Under the fairer rules it also drifts back toward normal over time, so one bad week can't shut anyone out again.",
+    console: ["takenAlert"], phone: "taken", last: "Last ping: just now · Last callout taken: just now", log: "Vesper took a callout" },
+];
+
+let i = 0, tick = null, left = 60;
+const $ = id => document.getElementById(id);
+const panels = ["phoneIdle", "phonePing", "phoneMissed", "phoneTaken"];
+const alerts = ["quietAlert", "queuedAlert", "missAlert", "takenAlert"];
+
+function show(n) {
+  i = Math.max(0, Math.min(steps.length - 1, n));
+  const s = steps[i];
+  clearInterval(tick);
+  $("stepNum").textContent = `Step ${i + 1} of ${steps.length}`;
+  $("stepTitle").textContent = s.title;
+  $("stepText").textContent = s.text;
+  $("back").disabled = i === 0;
+  $("next").disabled = i === steps.length - 1 || i === 1 || i === 3 || i === 5;
+  alerts.forEach(a => $(a).classList.toggle("hide", !s.console.includes(a)));
+  panels.forEach(p => $(p).classList.add("hide"));
+  $("lastPing").textContent = s.last;
+  $("log").innerHTML = steps.slice(0, i + 1).filter(x => x.log)
+    .map(x => `<li>${x.log}</li>`).reverse().join("");
+  if (s.phone === "idle") { $("phoneIdle").classList.remove("hide"); $("idleText").textContent = s.idle; }
+  if (s.phone === "missed") $("phoneMissed").classList.remove("hide");
+  if (s.phone === "taken") $("phoneTaken").classList.remove("hide");
+  if (s.phone === "ping") startPing(s.speed);
+}
+
+function startPing(speed) {
+  $("phonePing").classList.remove("hide");
+  left = 60; render();
+  $("timerHint").textContent = speed < 1000 ? "Demo: clock running 10× fast" : "Clock running at real speed";
+  tick = setInterval(() => {
+    left -= 1; render();
+    if (left <= 0) { clearInterval(tick); show(4); }
+  }, speed);
+}
+function render() { $("timer").textContent = left; $("bar").style.width = (left / 60 * 100) + "%"; }
+
+$("next").onclick = () => show(i + 1);
+$("back").onclick = () => show(i - 1);
+$("restart").onclick = () => show(0);
+$("sendNext").onclick = () => show(2);
+$("take").onclick = () => show(6);
+
+function clocks() {
+  const t = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  $("clock").textContent = t; $("phoneClock").textContent = t;
+}
+clocks(); setInterval(clocks, 30000);
+show(0);
+</script>
+</body>
+</html>
