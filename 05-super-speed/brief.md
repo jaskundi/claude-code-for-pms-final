@@ -31,7 +31,14 @@ Three changes. The first two are things people see.
   hasn't been asked in 5 days (usually about 12 pings a week)."*
 - A second warning goes on any responder who has missed 2 pings in a row:
   *"Vesper missed 2 pings: they timed out before an answer."*
-- Each warning has one action: **"Send Vesper the next suitable callout."**
+- The warning also says Vesper is **already first in line** for the next
+  suitable callout (that happens automatically, see 3). One button,
+  **"Let Vesper know"**, puts the same message on Vesper's phone.
+- **For handlers with more than one responder**, a busy card is flagged too
+  (*"The Gale is busier than usual: 20 pings last week, usually about 13"*),
+  and a strip shows how the area's callouts are split between them. This is
+  what Kip asked for: one quiet card next to one swamped card should
+  "look less like a coincidence".
 - *What Dot would notice:* she hears in days, not never, and can do
   something about it herself.
 
@@ -47,6 +54,12 @@ Three changes. The first two are things people see.
   (0.5) over a few weeks. This is the question Wen's 2019 note asked.
 - **A way back.** Someone who hasn't been asked in 5 days is offered the next
   callout they're suited for, even if they aren't top of the list.
+
+**Click-throughs.** `prototype.html` shows this for Vesper as Dot would see it.
+`prototype-meteor-mite.html` shows it for Meteor Mite as Kip would see it,
+next to The Gale. It also shows why one is quiet while the other is swamped:
+of Eastgate's 52 callouts from 12 Aug to 4 Sep, The Gale took 43 and Meteor
+Mite took 3 (before 12 Aug: 64 and 48 of 118).
 
 ## How we'd know it worked
 - Vesper and the other three get back to roughly their old ping levels

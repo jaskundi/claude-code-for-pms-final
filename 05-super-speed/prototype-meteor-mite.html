@@ -114,9 +114,10 @@
               <strong>Meteor Mite has gone quiet.</strong> Not asked in 6 days. Usually about 11 pings a week.
               <br><br>Since 12 Aug, 7 of Meteor Mite's pings timed out after 60 seconds.
               <strong>Timeouts no longer count against Meteor Mite.</strong>
-              <div><button class="primary" id="sendNext">Send Meteor Mite the next suitable callout</button></div>
+              <br><br>Meteor Mite is now <strong>first in line</strong> for the next Eastgate callout that suits.
+              <div><button class="primary" id="sendNext">Let Meteor Mite know</button></div>
             </div>
-            <div class="alert ok hide" id="miteQueued">Done. Meteor Mite will be asked first on the next Eastgate callout that suits.</div>
+            <div class="alert ok hide" id="miteQueued">Sent. Meteor Mite's phone now says first in line for the next Eastgate callout.</div>
             <div class="alert warn hide" id="miteMissed">That ping timed out after 60 seconds. <strong>Not counted against Meteor Mite.</strong> Still first in line for the next one.</div>
             <div class="alert ok hide" id="miteTaken"><strong>Meteor Mite took a callout just now.</strong> Warning cleared.</div>
           </div>
@@ -149,7 +150,7 @@
         <div class="top"><span>Rook Dispatch</span><span>23:50</span></div>
         <div class="body" id="phoneIdle">
           <div class="big">No callouts</div>
-          <div class="small">You're available.</div>
+          <div class="small" id="idleText">You're available.</div>
         </div>
         <div class="body hide" id="phonePing">
           <div class="small">New callout for you · Eastgate</div>
@@ -181,15 +182,15 @@ const steps = [
     text: "Thursday 4 Sep, near midnight. Meteor Mite's last ping was 29 Aug and the last callout taken was 19 Aug. The Gale got 20 pings last week. Both cards say 'Available' and nothing on screen connects them. This is the night Kip told our designer the two cards 'might as well be two different products'. All Kip can say to Meteor Mite is 'hang in there'.",
     show: [], phone: "idle", mite: ["Last ping 29 Aug · Last callout taken 19 Aug", "<b>2</b> pings last week"], gale: "Last ping 40 min ago" },
   { title: "With the change: the console explains itself",
-    text: "Meteor Mite's card says plainly what's happening and offers one action. The Gale's card flags the extra load. A strip underneath shows why they're linked: The Gale has been taking Meteor Mite's share of Eastgate. Under the proposed rules Kip would have had a first warning back on 13 Aug, after two timeouts in a row. Click the button on Meteor Mite's card.",
+    text: "Meteor Mite's card says plainly what's happening, and that Meteor Mite is now first in line for the next suitable callout (automatic after 5 quiet days). The Gale's card flags the extra load. A strip underneath shows why they're linked: The Gale has been taking Meteor Mite's share of Eastgate. Under the proposed rules Kip would have had a first warning back on 13 Aug, after two timeouts in a row. Click 'Let Meteor Mite know'.",
     show: ["miteQuiet", "galeBusy", "areaBox"], phone: "idle", mite: ["Last ping 29 Aug · Last callout taken 19 Aug", "<b>2</b> pings last week"], gale: "Last ping 40 min ago" },
-  { title: "Kip asks for Meteor Mite to be tried",
-    text: "The next Eastgate callout that suits Meteor Mite goes to Meteor Mite first, ahead of The Gale. Click Next to see it arrive.",
+  { title: "Kip lets Meteor Mite know",
+    text: "Meteor Mite's phone now says 'first in line', so it isn't just silent any more, and Kip has something better to say than 'hang in there'. Click Next to see the callout arrive.",
     show: ["miteQueued", "galeBusy", "areaBox"], phone: "idle", mite: ["Last ping 29 Aug · Last callout taken 19 Aug", "<b>2</b> pings last week"], gale: "Last ping 40 min ago",
-    log: "Kip asked for Meteor Mite to get the next suitable callout" },
+    log: "Kip let Meteor Mite know about being first in line" },
   { title: "A ping arrives on Meteor Mite's phone",
-    text: "It waits 60 seconds. The demo runs the clock 10× fast. Let it run out to see a timeout under the new rules, or tap 'Take it'.",
-    show: ["miteQueued", "galeBusy", "areaBox"], phone: "ping", speed: 100, mite: ["Last ping just now", "<b>2</b> pings last week"], gale: "Last ping 40 min ago" },
+    text: "It waits 60 seconds. The demo runs the clock 3× fast. Let it run out to see a timeout under the new rules, or tap 'Take it'.",
+    show: ["miteQueued", "galeBusy", "areaBox"], phone: "ping", speed: 333, mite: ["Last ping just now", "<b>2</b> pings last week"], gale: "Last ping 40 min ago" },
   { title: "A timeout is not a 'no'",
     text: "Today, this would cost Meteor Mite another 0.12 and push them further down the list. That's how 7 timeouts since 12 Aug took them to the bottom. Under the new rules, nothing is taken off, Meteor Mite stays first in line, and both Kip and Meteor Mite can see why the ping vanished.",
     show: ["miteMissed", "galeBusy", "areaBox"], phone: "missed", mite: ["Last ping just now (timed out)", "<b>2</b> pings last week"], gale: "Last ping 40 min ago",
@@ -228,17 +229,19 @@ function show(n) {
   $("log").innerHTML = steps.slice(0, i + 1).filter(x => x.log)
     .map(x => `<li>${x.log}</li>`).reverse().join("");
   panels.forEach(p => $(p).classList.add("hide"));
+  $("idleText").textContent = i === 2 ? "You're first in line for the next callout that suits you." : "You're available.";
   if (s.phone === "ping") startPing(s.speed);
   else $({ idle: "phoneIdle", missed: "phoneMissed", taken: "phoneTaken" }[s.phone]).classList.remove("hide");
 }
 
 function startPing(speed) {
   $("phonePing").classList.remove("hide");
+  $("phonePing").closest(".phone").scrollIntoView({ behavior: "smooth", block: "center" });
   left = 60; render();
-  $("timerHint").textContent = speed < 1000 ? "Demo: clock running 10× fast" : "Clock running at real speed";
+  $("timerHint").textContent = speed < 1000 ? "Demo: clock running 3× fast" : "Clock running at real speed";
   tick = setInterval(() => {
     left -= 1; render();
-    if (left <= 0) { clearInterval(tick); show(4); }
+    if (left <= 0) { clearInterval(tick); setTimeout(() => { if (i === 3 || i === 5) show(4); }, 1200); }
   }, speed);
 }
 function render() { $("timer").textContent = left; $("bar").style.width = (left / 60 * 100) + "%"; }

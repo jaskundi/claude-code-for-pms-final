@@ -104,10 +104,11 @@
           <div class="meta" id="lastPing"></div>
           <div class="alert warn hide" id="quietAlert">
             <strong>Vesper has gone quiet.</strong> Not asked in 5 days. They usually get about 12 pings a week.
-            <div><button class="primary" id="sendNext">Send Vesper the next suitable callout</button></div>
+            Vesper is now <strong>first in line</strong> for the next callout they're suited for.
+            <div><button class="primary" id="sendNext">Let Vesper know</button></div>
           </div>
           <div class="alert ok hide" id="queuedAlert">
-            Done. Vesper will be asked first on the next callout they're suited for.
+            Sent. Vesper's phone now says they're first in line for the next suitable callout.
           </div>
           <div class="alert warn hide" id="missAlert">
             Vesper's ping timed out after 60 seconds. <strong>Not counted against them.</strong>
@@ -159,14 +160,14 @@ const steps = [
     text: "This is Dot's console right now. Vesper is 'Available', so Dot assumes all is well. But the system stopped asking Vesper weeks ago, and nothing tells her. Vesper's phone is just silent.",
     console: [], phone: "idle", idle: "You're available.", last: "Last ping: 1 Sep · Last callout taken: 17 Aug" },
   { title: "With the change: Dot gets a heads-up",
-    text: "After 5 days with no ping, Vesper's card shows a plain warning and one thing Dot can do about it. Click the button on Dot's console.",
+    text: "After 5 days with no ping, Vesper automatically goes to the front of the line for the next suitable callout, and Dot's console says so. Dot can also tell Vesper. Click 'Let Vesper know'.",
     console: ["quietAlert"], phone: "idle", idle: "You're available.", last: "Last ping: 5 days ago" },
-  { title: "Dot asks for Vesper to be tried",
-    text: "The next callout Vesper is suited for goes to them first, instead of the top of the list. Click Next to see it arrive.",
-    console: ["queuedAlert"], phone: "idle", idle: "You're available.", last: "Last ping: 5 days ago", log: "Dot asked for Vesper to get the next suitable callout" },
+  { title: "Dot lets Vesper know",
+    text: "Vesper's phone now says they're first in line, so a quiet phone no longer feels like being forgotten. Click Next to see the callout arrive.",
+    console: ["queuedAlert"], phone: "idle", idle: "You're first in line for the next callout that suits you.", last: "Last ping: 5 days ago", log: "Dot let Vesper know they're first in line" },
   { title: "A ping arrives, and Vesper's on the stairs",
-    text: "The ping waits 60 seconds. This demo runs the clock fast. Let it run out to see what a timeout looks like now, or tap 'Take it'.",
-    console: ["queuedAlert"], phone: "ping", speed: 100, last: "Last ping: just now" },
+    text: "The ping waits 60 seconds. This demo runs the clock 3× fast. Let it run out to see what a timeout looks like now, or tap 'Take it'.",
+    console: ["queuedAlert"], phone: "ping", speed: 333, last: "Last ping: just now" },
   { title: "A timeout is not a 'no'",
     text: "Vesper sees why the ping vanished, and that it didn't count against them. Dot sees it too. Under today's rules this would have cost Vesper 0.12, the same as refusing.",
     console: ["missAlert"], phone: "missed", last: "Last ping: just now (timed out)", log: "Ping timed out after 60 s · not counted against Vesper" },
@@ -205,11 +206,12 @@ function show(n) {
 
 function startPing(speed) {
   $("phonePing").classList.remove("hide");
+  $("phonePing").closest(".phone").scrollIntoView({ behavior: "smooth", block: "center" });
   left = 60; render();
-  $("timerHint").textContent = speed < 1000 ? "Demo: clock running 10× fast" : "Clock running at real speed";
+  $("timerHint").textContent = speed < 1000 ? "Demo: clock running 3× fast" : "Clock running at real speed";
   tick = setInterval(() => {
     left -= 1; render();
-    if (left <= 0) { clearInterval(tick); show(4); }
+    if (left <= 0) { clearInterval(tick); setTimeout(() => { if (i === 3 || i === 5) show(4); }, 1200); }
   }, speed);
 }
 function render() { $("timer").textContent = left; $("bar").style.width = (left / 60 * 100) + "%"; }

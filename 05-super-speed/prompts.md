@@ -15,7 +15,19 @@ prompt library built from your own questions.
 ---
 
 ### 1.
+Is this prototype using the fix Priya had suggested?
 
 ### 2.
+Did any anyone suggest a fix?
 
 ### 3.
+Did anyone from UX/UI suggest any fixes or ideas on the new proposed design?
+
+### 4.
+Was Vesper not the superhero we initially modelled for?
+
+### 5.
+do we need to make changes to our prototype based on the updated brief?
+
+### 6.
+I think my prototype is broken the phone does not show the countdown for a callout
