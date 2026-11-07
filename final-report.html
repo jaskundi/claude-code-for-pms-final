@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Release 4.2 Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
 <meta name="description" content="Final project for Product School's Claude Code for PMs course: how Release 4.2 quietly shut four responders out of work, the evidence, the fix and the skill that guards against a repeat. Rook Industries is fictional.">
 <style>
 :root {
@@ -316,6 +318,130 @@ svg.chart .hit:hover + .mark, svg.chart .mark:hover { opacity: .85; }
   body { overflow: visible; } .topbar, .navbar { display: none; } .deck { position: static; }
   .slide { position: relative; opacity: 1; visibility: visible; transform: none; page-break-after: always; overflow: visible; }
 }
+
+/* =================== COMIC BOOK THEME LAYER =================== */
+:root {
+  --c-ink: #111111; --c-paper: #fff8e7; --c-yellow: #ffd60a; --c-red: #e63946; --c-blue: #1d4ed8; --c-cyan: #38bdf8; --c-green: #16a34a;
+  --bg: #fff8e7; --surface: #ffffff; --surface-2: #fff3cf; --ink: #111111; --ink-2: #2b2b2b; --muted: #5a5348;
+  --line: #111111; --line-2: #111111;
+  --accent: #1d4ed8; --accent-ink: #ffffff; --accent-soft: #dbe6ff;
+  --fault: #c1121f; --fault-soft: #ffe1e1; --fix: #12813c; --fix-soft: #dcf7e5; --amber: #8a5a00; --amber-soft: #fff1b8;
+  --open: #334155; --open-soft: #e2e8f0;
+  --shadow: 5px 5px 0 var(--c-ink); --radius: 6px;
+  --ff-display: "Bangers", Impact, "Arial Black", "Helvetica Neue", sans-serif;
+  --halftone: radial-gradient(circle, rgba(17,17,17,.13) 1.2px, transparent 1.6px);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --c-paper: #1c1a24; --bg: #1c1a24; --surface: #2a2735; --surface-2: #34303f; --ink: #fdf6e3; --ink-2: #e7dfcc; --muted: #c2b8a3;
+  --line: #000000; --line-2: #000000; --accent: #7aa2ff; --accent-ink: #0b0b12; --accent-soft: #2b3560;
+  --fault: #ff8a8a; --fault-soft: #4a1f24; --fix: #6ee7a0; --fix-soft: #173a26; --amber: #ffd60a; --amber-soft: #3d3412; --open: #cbd5e1; --open-soft: #2f3644;
+  --shadow: 5px 5px 0 #000; --halftone: radial-gradient(circle, rgba(255,255,255,.07) 1.2px, transparent 1.6px);
+} }
+:root[data-theme="dark"] {
+  --c-paper: #1c1a24; --bg: #1c1a24; --surface: #2a2735; --surface-2: #34303f; --ink: #fdf6e3; --ink-2: #e7dfcc; --muted: #c2b8a3;
+  --line: #000000; --line-2: #000000; --accent: #7aa2ff; --accent-ink: #0b0b12; --accent-soft: #2b3560;
+  --fault: #ff8a8a; --fault-soft: #4a1f24; --fix: #6ee7a0; --fix-soft: #173a26; --amber: #ffd60a; --amber-soft: #3d3412; --open: #cbd5e1; --open-soft: #2f3644;
+  --shadow: 5px 5px 0 #000; --halftone: radial-gradient(circle, rgba(255,255,255,.07) 1.2px, transparent 1.6px);
+}
+body { background-color: var(--bg); background-image: var(--halftone); background-size: 9px 9px; }
+
+/* Chrome */
+.topbar { background: var(--c-yellow); border-bottom: 4px solid var(--c-ink); backdrop-filter: none; color: #111; }
+.brand { font-family: var(--ff-display); font-size: 22px; letter-spacing: .04em; font-weight: 400; }
+.brand span { color: #111; opacity: .75; }
+.section-name { color: #111; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; font-size: 12px; }
+.fiction { border: 2px solid #111; background: #fff; color: #111; font-weight: 700; }
+.progress { height: 6px; bottom: -5px; background: var(--c-red); border-right: 3px solid #111; }
+.navbar { background: var(--c-ink); border-top: 4px solid var(--c-ink); backdrop-filter: none; }
+.navbtn, .navbar select { border: 3px solid #111; border-radius: 4px; box-shadow: 3px 3px 0 #000; background: #fff; color: #111; font-weight: 700; }
+.navbtn.primary { background: var(--c-red); color: #fff; border-color: #111; font-family: var(--ff-display); font-size: 19px; letter-spacing: .06em; font-weight: 400; }
+.navbtn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #000; }
+.navbtn:disabled { opacity: .45; }
+.counter { color: var(--c-yellow); font-family: var(--ff-display); font-size: 20px; letter-spacing: .06em;  white-space: nowrap; }
+@media (max-width: 720px) { .counter { font-size: 16px; letter-spacing: 0; min-width: 40px; } }
+.kbd { color: #555; }
+
+/* Type */
+h2.title { font-family: var(--ff-display); font-weight: 400; text-transform: uppercase; letter-spacing: .02em; line-height: 1.02; font-size: clamp(34px, 4.6vw, 58px);
+  color: var(--ink); text-shadow: 3px 3px 0 var(--c-yellow); max-width: 26ch; }
+h3 { font-family: var(--ff-display); font-weight: 400; letter-spacing: .04em; text-transform: uppercase; font-size: 21px; }
+.chart-card h3 { font-size: 20px; }
+.eyebrow { display: inline-block; background: var(--c-yellow); color: #111; border: 3px solid #111; box-shadow: 4px 4px 0 #111; padding: 5px 12px; letter-spacing: .08em;
+  font-size: 12.5px; font-weight: 800; transform: rotate(-1.2deg); margin-bottom: 18px; }
+.lede { font-weight: 500; }
+.stat { font-family: var(--ff-display); font-weight: 400; letter-spacing: .02em; }
+
+/* Panels */
+.card, .flow .node, .link, .check, .rtable, .mtab, .proto-frame, details.prompt, .tabs, .ba-toggle { border: 3px solid var(--line) !important; border-radius: var(--radius); box-shadow: var(--shadow); }
+.card.fault, .card.fix, .card.accent { border-top-width: 3px !important; }
+.card.fault { background: linear-gradient(var(--fault-soft), var(--fault-soft)) top / 100% 10px no-repeat, var(--surface); }
+.card.fix { background: linear-gradient(var(--fix-soft), var(--fix-soft)) top / 100% 10px no-repeat, var(--surface); }
+.card.accent { background: linear-gradient(var(--accent-soft), var(--accent-soft)) top / 100% 10px no-repeat, var(--surface); }
+.card.fault::before, .card.fix::before, .card.accent::before { content: ""; display: block; height: 8px; margin: -18px -20px 14px; border-bottom: 3px solid var(--line); }
+.card.fault::before { background: var(--c-red); } .card.fix::before { background: var(--c-green); } .card.accent::before { background: var(--c-blue); }
+.card.quiet { background: var(--surface-2); box-shadow: var(--shadow); }
+.grid > .card:nth-child(odd), .lanes > .card:nth-child(odd) { transform: rotate(-.35deg); }
+.grid > .card:nth-child(even), .lanes > .card:nth-child(even) { transform: rotate(.35deg); }
+.rtable > div { border-bottom: 2px solid var(--line); }
+.rtable > .h { background: var(--c-yellow); color: #111; font-weight: 800; }
+.tag { border: 2px solid currentColor; border-radius: 4px; font-weight: 800; }
+.flow .node:not(:last-child)::after { border-color: var(--line); border-width: 4px 4px 0 0; }
+.flow .node.f { background: var(--fault-soft); } .flow .node.g { background: var(--fix-soft); }
+.timeline .tl-track::before { height: 4px; background: var(--line); }
+.tl-item::before { border-width: 4px; background: var(--c-yellow); border-color: var(--line) !important; }
+.tl-item.f::before { background: var(--c-red); } .tl-item.g::before { background: var(--c-green); } .tl-item.a::before { background: var(--c-cyan); }
+.link .num { background: var(--c-red); color: #fff; border: 3px solid #111; font-family: var(--ff-display); font-size: 18px; font-weight: 400; }
+.mtab[aria-selected="true"] { background: var(--c-yellow); color: #111; box-shadow: 6px 6px 0 var(--c-red); transform: translate(-2px,-2px); }
+.mtab[aria-selected="true"] .n { color: #111; }
+.mtab .t { font-family: var(--ff-display); font-weight: 400; font-size: 20px; letter-spacing: .04em; }
+.prog i { height: 8px; border: 2px solid var(--line); border-radius: 2px; background: var(--surface); }
+.prog i.on { background: var(--c-red); }
+.tab[aria-selected="true"], .ba-toggle button[aria-pressed="true"] { background: var(--c-yellow); color: #111; border: 2px solid #111; box-shadow: none; }
+.verdict { border: 2px solid currentColor; border-radius: 4px; }
+.hbar .tr { border: 2px solid var(--line); background: var(--surface); height: 14px; }
+.hbar .fl { border-radius: 0; }
+
+/* Speech bubbles for prompts and quotes */
+.prompt-body blockquote { position: relative; background: #fff; color: #111; border: 3px solid #111; border-radius: 22px; padding: 14px 18px; margin: 4px 0 18px;
+  font-family: var(--ff); font-size: 14.5px; font-weight: 600; box-shadow: 4px 4px 0 #111; }
+.prompt-body blockquote::after { content: ""; position: absolute; left: 34px; bottom: -19px; width: 22px; height: 22px; background: #fff; border-right: 3px solid #111; border-bottom: 3px solid #111;
+  transform: skewX(-30deg) rotate(45deg); }
+.check .body q { background: #fff; color: #111; border: 2px solid #111; border-radius: 16px; font-family: var(--ff); font-weight: 600; }
+
+/* Hero */
+.slide.hero { background:
+  repeating-conic-gradient(from 0deg at 82% 30%, rgba(255,255,255,.07) 0deg 4deg, transparent 4deg 12deg),
+  radial-gradient(circle, rgba(255,255,255,.12) 1.4px, transparent 1.8px) 0 0 / 10px 10px,
+  linear-gradient(150deg, #1d4ed8 0%, #312e81 55%, #7f1d1d 130%); }
+.hero h1 { font-family: var(--ff-display); font-weight: 400; text-transform: uppercase; letter-spacing: .02em; line-height: .98; color: #fff;
+  text-shadow: 4px 4px 0 #111, -1px -1px 0 #111, 1px -1px 0 #111, -1px 1px 0 #111; font-size: clamp(44px, 6.6vw, 92px); }
+.hero h1 em { background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--c-yellow); }
+.hero h1 em.good { background: none; color: #7ef0b1; }
+.slide.hero .eyebrow { color: #111; }
+.hero-card { background: #fff; color: #111; border: 4px solid #111; border-radius: 6px; box-shadow: 8px 8px 0 #111; backdrop-filter: none; transform: rotate(.8deg); position: relative; }
+.hero-card .muted { color: #555; }
+.hb-track { background: #eee; border: 2px solid #111; }
+.hb-fill { border-radius: 0; }
+.rec-pill { background: #fff; color: #111; border: 4px solid #111; border-radius: 26px; box-shadow: 6px 6px 0 #111; position: relative; }
+.rec-pill b { color: var(--c-red); }
+.rec-pill::after { content: ""; position: absolute; left: 46px; bottom: -22px; width: 24px; height: 24px; background: #fff; border-right: 4px solid #111; border-bottom: 4px solid #111; transform: skewX(-30deg) rotate(45deg); }
+.meta-row { color: #fff; font-weight: 700; } .meta-row span { background: rgba(0,0,0,.35); padding: 3px 8px; border: 2px solid #111; }
+.takeaways li { color: #fff; } .takeaways li::before { color: var(--c-yellow); font-family: var(--ff-display); font-size: 24px; font-weight: 400; }
+.hero .footnote { color: #e5e7ff; }
+
+/* Starbursts */
+.burst { position: absolute; pointer-events: none; z-index: 3; }
+.burst svg { width: 100%; height: auto; display: block; overflow: visible; }
+.burst text { font-family: var(--ff-display); font-size: 30px; fill: #111; letter-spacing: .03em; }
+.burst-hero { width: 230px; right: -46px; top: -86px; transform: rotate(10deg); }
+.burst-cause { width: 220px; right: 0; top: -10px; transform: rotate(8deg); }
+.burst-skill { width: 200px; right: 0; top: -14px; transform: rotate(-8deg); }
+.burst-end { width: 250px; right: 4%; top: 10%; transform: rotate(-9deg); }
+.inner { position: relative; }
+@media (max-width: 960px) { .burst-cause, .burst-skill { display: none; } .burst-hero { width: 150px; right: 4px; top: -66px; } .burst-end { position: static; width: 200px; margin: 0 0 10px auto; } }
+.caption-box { display: inline-block; background: var(--c-yellow); color: #111; border: 3px solid #111; box-shadow: 4px 4px 0 #111; padding: 8px 14px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .06em; font-size: 13px; margin-top: 24px; transform: rotate(-1deg); }
+@media (prefers-reduced-motion: reduce) { .grid > .card, .lanes > .card, .eyebrow, .hero-card, .burst, .caption-box, .mtab[aria-selected="true"] { transform: none !important; } }
 </style>
 </head>
 <body>
@@ -342,6 +468,7 @@ svg.chart .hit:hover + .mark, svg.chart .mark:hover { opacity: .85; }
       </div>
     </div>
     <div class="hero-card" aria-label="Pings a week, before and after Release 4.2">
+      <div class="burst burst-hero" role="img" aria-label="4 of 16 responders gone quiet"><svg viewBox="0 0 300 220" aria-hidden="true"><polygon points="150.0,2.2 172.2,38.5 213.8,12.9 212.3,52.7 264.9,42.8 240.1,78.2 293.3,86.0 250.0,110.0 293.3,134.0 240.1,141.8 264.9,177.2 212.3,167.3 213.8,207.1 172.2,181.5 150.0,217.8 127.8,181.5 86.2,207.1 87.7,167.3 35.1,177.2 59.9,141.8 6.7,134.0 50.0,110.0 6.7,86.0 59.9,78.2 35.1,42.8 87.7,52.7 86.2,12.9 127.8,38.5" fill="var(--c-ink)" transform="translate(6,6)"/><polygon points="150.0,2.2 172.2,38.5 213.8,12.9 212.3,52.7 264.9,42.8 240.1,78.2 293.3,86.0 250.0,110.0 293.3,134.0 240.1,141.8 264.9,177.2 212.3,167.3 213.8,207.1 172.2,181.5 150.0,217.8 127.8,181.5 86.2,207.1 87.7,167.3 35.1,177.2 59.9,141.8 6.7,134.0 50.0,110.0 6.7,86.0 59.9,78.2 35.1,42.8 87.7,52.7 86.2,12.9 127.8,38.5" fill="var(--c-yellow)" stroke="var(--c-ink)" stroke-width="4" stroke-linejoin="round"/><text x="150.0" y="88" text-anchor="middle">4 OF 16</text><text x="150.0" y="122" text-anchor="middle">GONE</text><text x="150.0" y="156" text-anchor="middle">QUIET!</text></svg></div>
       <p class="small muted" style="margin-bottom:6px">Pings a week, before vs after 12 Aug</p>
       <p style="font-weight:650; font-size:18px; margin-bottom:12px">The four responders who went quiet</p>
       <div class="hero-bars">
@@ -1199,6 +1326,7 @@ show(0);
 <section class="slide" data-name="Root cause" aria-labelledby="s8t">
   <div class="inner">
     <p class="eyebrow">Key findings and root cause</p>
+    <div class="burst burst-cause" role="img" aria-label="The villain: three old rules"><svg viewBox="0 0 300 220" aria-hidden="true"><polygon points="150.0,2.2 172.2,38.5 213.8,12.9 212.3,52.7 264.9,42.8 240.1,78.2 293.3,86.0 250.0,110.0 293.3,134.0 240.1,141.8 264.9,177.2 212.3,167.3 213.8,207.1 172.2,181.5 150.0,217.8 127.8,181.5 86.2,207.1 87.7,167.3 35.1,177.2 59.9,141.8 6.7,134.0 50.0,110.0 6.7,86.0 59.9,78.2 35.1,42.8 87.7,52.7 86.2,12.9 127.8,38.5" fill="var(--c-ink)" transform="translate(6,6)"/><polygon points="150.0,2.2 172.2,38.5 213.8,12.9 212.3,52.7 264.9,42.8 240.1,78.2 293.3,86.0 250.0,110.0 293.3,134.0 240.1,141.8 264.9,177.2 212.3,167.3 213.8,207.1 172.2,181.5 150.0,217.8 127.8,181.5 86.2,207.1 87.7,167.3 35.1,177.2 59.9,141.8 6.7,134.0 50.0,110.0 6.7,86.0 59.9,78.2 35.1,42.8 87.7,52.7 86.2,12.9 127.8,38.5" fill="var(--c-red)" stroke="var(--c-ink)" stroke-width="4" stroke-linejoin="round"/><text x="150.0" y="88" text-anchor="middle">THE VILLAIN?</text><text x="150.0" y="122" text-anchor="middle">3 OLD</text><text x="150.0" y="156" text-anchor="middle">RULES!</text></svg></div>
     <h2 class="title" id="s8t">Not one bad number: a shorter wait sprang an old trap</h2>
     <p class="lede">The 60-second wait didn't cause this on its own. It met three older rules that had never been tested by slow answers.</p>
     <div class="split mt">
@@ -1403,6 +1531,7 @@ show(0);
 <section class="slide" data-name="Prevention: my skill" aria-labelledby="s13t">
   <div class="inner">
     <p class="eyebrow">Preventing it from happening again</p>
+    <div class="burst burst-skill" role="img" aria-label="Meet my sidekick"><svg viewBox="0 0 300 220" aria-hidden="true"><polygon points="150.0,2.2 172.2,38.5 213.8,12.9 212.3,52.7 264.9,42.8 240.1,78.2 293.3,86.0 250.0,110.0 293.3,134.0 240.1,141.8 264.9,177.2 212.3,167.3 213.8,207.1 172.2,181.5 150.0,217.8 127.8,181.5 86.2,207.1 87.7,167.3 35.1,177.2 59.9,141.8 6.7,134.0 50.0,110.0 6.7,86.0 59.9,78.2 35.1,42.8 87.7,52.7 86.2,12.9 127.8,38.5" fill="var(--c-ink)" transform="translate(6,6)"/><polygon points="150.0,2.2 172.2,38.5 213.8,12.9 212.3,52.7 264.9,42.8 240.1,78.2 293.3,86.0 250.0,110.0 293.3,134.0 240.1,141.8 264.9,177.2 212.3,167.3 213.8,207.1 172.2,181.5 150.0,217.8 127.8,181.5 86.2,207.1 87.7,167.3 35.1,177.2 59.9,141.8 6.7,134.0 50.0,110.0 6.7,86.0 59.9,78.2 35.1,42.8 87.7,52.7 86.2,12.9 127.8,38.5" fill="var(--c-cyan)" stroke="var(--c-ink)" stroke-width="4" stroke-linejoin="round"/><text x="150.0" y="105" text-anchor="middle">MEET MY</text><text x="150.0" y="139" text-anchor="middle">SIDEKICK!</text></svg></div>
     <h2 class="title" id="s13t">review-checklist: a second pair of eyes on every brief</h2>
     <p class="lede">Rook's planning had the gaps this skill looks for: every roadmap owner still listed as someone who'd left, Bulk Callout shipped with no baseline, and Requisition Chains proposing an approval step when the complaint was slowness. The skill catches those in the brief, before anything is built.</p>
     <div class="flow mt" role="list" aria-label="How the skill fits the release process">
@@ -1491,6 +1620,7 @@ show(0);
 <!-- 16 ─ CLOSING -->
 <section class="slide hero closing" data-name="Final takeaway" aria-labelledby="s16t">
   <div class="inner" style="min-height:100%; display:flex; flex-direction:column; justify-content:center">
+    <div class="burst burst-end" role="img" aria-label="The end?"><svg viewBox="0 0 300 220" aria-hidden="true"><polygon points="150.0,2.2 172.2,38.5 213.8,12.9 212.3,52.7 264.9,42.8 240.1,78.2 293.3,86.0 250.0,110.0 293.3,134.0 240.1,141.8 264.9,177.2 212.3,167.3 213.8,207.1 172.2,181.5 150.0,217.8 127.8,181.5 86.2,207.1 87.7,167.3 35.1,177.2 59.9,141.8 6.7,134.0 50.0,110.0 6.7,86.0 59.9,78.2 35.1,42.8 87.7,52.7 86.2,12.9 127.8,38.5" fill="var(--c-ink)" transform="translate(6,6)"/><polygon points="150.0,2.2 172.2,38.5 213.8,12.9 212.3,52.7 264.9,42.8 240.1,78.2 293.3,86.0 250.0,110.0 293.3,134.0 240.1,141.8 264.9,177.2 212.3,167.3 213.8,207.1 172.2,181.5 150.0,217.8 127.8,181.5 86.2,207.1 87.7,167.3 35.1,177.2 59.9,141.8 6.7,134.0 50.0,110.0 6.7,86.0 59.9,78.2 35.1,42.8 87.7,52.7 86.2,12.9 127.8,38.5" fill="var(--c-yellow)" stroke="var(--c-ink)" stroke-width="4" stroke-linejoin="round"/><text x="150.0" y="105" text-anchor="middle">THE</text><text x="150.0" y="139" text-anchor="middle">END?</text></svg></div>
     <p class="eyebrow">Final executive takeaway</p>
     <h1 id="s16t">Fix the rules, <em class="good">and make silence visible</em>.</h1>
     <ol class="takeaways">
@@ -1501,6 +1631,7 @@ show(0);
       <li><span><b>review-checklist</b> catches missing owners, missing measures and drifting scope before a brief is built.</span></li>
       <li><span><b>The decision I need</b>: name an owner, and have Wen confirm the mechanism before anything ships.</span></li>
     </ol>
+    <p class="caption-box">To be continued… once Wen confirms and the Director names an owner.</p>
     <p class="footnote">Rook Industries is a fictional teaching scenario from Product School's "Claude Code for PMs" (cohort ccpm-2026.1). All figures come from the course's Rook database, wiki and code, as recorded in this project's CLAUDE.md and Module 5 brief.</p>
   </div>
 </section>
