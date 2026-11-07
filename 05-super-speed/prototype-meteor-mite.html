@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kip's Console Prototype</title>
+<style>
+  :root {
+    --bg: #f5f4f0; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a66;
+    --line: #e2e0da; --accent: #2f5bd3; --accent-ink: #ffffff;
+    --warn-bg: #fff4dc; --warn-line: #e6b34a; --warn-ink: #7a5300;
+    --ok-bg: #e5f5ea; --ok-line: #5bb37a; --ok-ink: #1f6b3a;
+    --info-bg: #eaf0ff; --info-line: #8aa5ef; --info-ink: #233f8f;
+    --phone: #16161a; --screen: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141413; --panel: #1f1f1d; --ink: #f0efea; --muted: #a3a29c;
+      --line: #34332f; --accent: #7d9cff; --accent-ink: #10131c;
+      --warn-bg: #3a2e12; --warn-line: #b88a2c; --warn-ink: #f3d38a;
+      --ok-bg: #16301f; --ok-line: #3f8f5a; --ok-ink: #a6e0b8;
+      --info-bg: #18213a; --info-line: #4a63a8; --info-ink: #b9c8f5;
+      --phone: #000000; --screen: #1f1f1d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 20px 16px 40px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  .story { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 18px; }
+  .story .step { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+  .story h2 { font-size: 17px; margin: 2px 0 4px; }
+  .story p { margin: 0; }
+  .nav { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  button { font: inherit; border-radius: 8px; padding: 8px 14px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  button:disabled { opacity: .4; cursor: default; }
+  .stage { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } .phone { margin: 0 auto; } }
+  .label { font-size: 12px; color: var(--muted); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .04em; }
+
+  .console { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .console header { padding: 10px 14px; border-bottom: 1px solid var(--line); display: flex;
+    justify-content: space-between; font-weight: 600; }
+  .console header span { font-weight: 400; color: var(--muted); }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; }
+  @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .row { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .name { font-weight: 600; font-size: 16px; }
+  .pill { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--ok-bg);
+    color: var(--ok-ink); border: 1px solid var(--ok-line); }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .stat { font-size: 13px; margin-top: 8px; }
+  .stat b { font-size: 18px; }
+  .alert { margin-top: 10px; border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+  .alert.warn { background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); }
+  .alert.ok { background: var(--ok-bg); border: 1px solid var(--ok-line); color: var(--ok-ink); }
+  .alert.info { background: var(--info-bg); border: 1px solid var(--info-line); color: var(--info-ink); }
+  .alert button { margin-top: 8px; }
+  .area { margin: 0 14px 14px; }
+  .area .alert { margin-top: 0; }
+  .split { display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin: 6px 0 2px; background: var(--line); }
+  .split i { display: block; height: 100%; }
+  .split .m { background: var(--warn-line); } .split .g { background: var(--accent); }
+  .log { margin: 0 14px 14px; padding-left: 18px; font-size: 13px; color: var(--muted); }
+
+  .phone { width: 280px; background: var(--phone); border-radius: 32px; padding: 14px; }
+  .screen { background: var(--screen); border-radius: 22px; min-height: 440px; padding: 18px 16px;
+    display: flex; flex-direction: column; }
+  .screen .top { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+  .screen .body { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; gap: 10px; }
+  .big { font-size: 20px; font-weight: 600; }
+  .timer { font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+  .small { font-size: 13px; color: var(--muted); }
+  .note { text-align: left; }
+  .hide { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>What Kip would see: Meteor Mite and The Gale</h1>
+  <p class="sub">Kip's console on the left, Meteor Mite's phone on the right. Ping counts are real (pings table, to 4 Sep).
+    Wording, warning levels and the callout itself are placeholders.</p>
+
+  <div class="story">
+    <div class="step" id="stepNum"></div>
+    <h2 id="stepTitle"></h2>
+    <p id="stepText"></p>
+    <div class="nav">
+      <button id="back">← Back</button>
+      <button id="next" class="primary">Next →</button>
+      <button id="restart">Start over</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div>
+      <p class="label">Handler console · Kip</p>
+      <div class="console">
+        <header>My responders · Eastgate <span>Thu 4 Sep, 23:50</span></header>
+        <div class="cards">
+          <div class="card">
+            <div class="row"><div class="name">Meteor Mite</div><div class="pill">Available</div></div>
+            <div class="meta" id="miteLast"></div>
+            <div class="stat" id="miteStat"></div>
+            <div class="alert warn hide" id="miteQuiet">
+              <strong>Meteor Mite has gone quiet.</strong> Not asked in 6 days. Usually about 11 pings a week.
+              <br><br>Since 12 Aug, 7 of Meteor Mite's pings timed out after 60 seconds.
+              <strong>Timeouts no longer count against Meteor Mite.</strong>
+              <div><button class="primary" id="sendNext">Send Meteor Mite the next suitable callout</button></div>
+            </div>
+            <div class="alert ok hide" id="miteQueued">Done. Meteor Mite will be asked first on the next Eastgate callout that suits.</div>
+            <div class="alert warn hide" id="miteMissed">That ping timed out after 60 seconds. <strong>Not counted against Meteor Mite.</strong> Still first in line for the next one.</div>
+            <div class="alert ok hide" id="miteTaken"><strong>Meteor Mite took a callout just now.</strong> Warning cleared.</div>
+          </div>
+          <div class="card">
+            <div class="row"><div class="name">The Gale</div><div class="pill">Available</div></div>
+            <div class="meta" id="galeLast"></div>
+            <div class="stat"><b>20</b> pings last week</div>
+            <div class="alert info hide" id="galeBusy"><strong>The Gale is busier than usual.</strong> 20 pings last week, usually about 13.</div>
+            <div class="alert ok hide" id="galeRelief">This callout went to Meteor Mite, not The Gale.</div>
+          </div>
+        </div>
+        <div class="area hide" id="areaBox">
+          <div class="alert info">
+            <strong>Why one card is quiet and the other is busy.</strong> Who took Eastgate's callouts:
+            <div class="small" style="margin-top:6px">Before 12 Aug (118 callouts)</div>
+            <div class="split"><i class="m" style="width:41%"></i><i class="g" style="width:54%"></i></div>
+            <div class="small">Meteor Mite 48 · The Gale 64 · nobody 6</div>
+            <div class="small" style="margin-top:6px">12 Aug to 4 Sep (<span id="areaTotal">52</span> callouts)</div>
+            <div class="split"><i class="m" id="areaM" style="width:5%"></i><i class="g" id="areaG" style="width:83%"></i></div>
+            <div class="small">Meteor Mite <span id="areaMite">3</span> · The Gale 43 · nobody 6</div>
+          </div>
+        </div>
+        <ul class="log" id="log"></ul>
+      </div>
+    </div>
+
+    <div>
+      <p class="label">Responder phone · Meteor Mite</p>
+      <div class="phone"><div class="screen">
+        <div class="top"><span>Rook Dispatch</span><span>23:50</span></div>
+        <div class="body" id="phoneIdle">
+          <div class="big">No callouts</div>
+          <div class="small">You're available.</div>
+        </div>
+        <div class="body hide" id="phonePing">
+          <div class="small">New callout for you · Eastgate</div>
+          <div class="big">Collapsed scaffolding</div>
+          <div class="small">About 4 minutes away</div>
+          <div class="timer" id="timer">60</div>
+          <div class="bar"><i id="bar" style="width:100%"></i></div>
+          <div class="small" id="timerHint"></div>
+          <button class="primary" id="take">Take it</button>
+        </div>
+        <div class="body hide" id="phoneMissed">
+          <div class="alert warn note">
+            <strong>This one moved on after 60 seconds.</strong><br>
+            A timeout doesn't count against you. You're first in line for the next one that suits you.
+          </div>
+        </div>
+        <div class="body hide" id="phoneTaken">
+          <div class="big">You're on it</div>
+          <div class="small">Directions and details are on the next screen.</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  { title: "Today: two cards, two different stories, no reason given",
+    text: "Thursday 4 Sep, near midnight. Meteor Mite's last ping was 29 Aug and the last callout taken was 19 Aug. The Gale got 20 pings last week. Both cards say 'Available' and nothing on screen connects them. This is the night Kip told our designer the two cards 'might as well be two different products'. All Kip can say to Meteor Mite is 'hang in there'.",
+    show: [], phone: "idle", mite: ["Last ping 29 Aug · Last callout taken 19 Aug", "<b>2</b> pings last week"], gale: "Last ping 40 min ago" },
+  { title: "With the change: the console explains itself",
+    text: "Meteor Mite's card says plainly what's happening and offers one action. The Gale's card flags the extra load. A strip underneath shows why they're linked: The Gale has been taking Meteor Mite's share of Eastgate. Under the proposed rules Kip would have had a first warning back on 13 Aug, after two timeouts in a row. Click the button on Meteor Mite's card.",
+    show: ["miteQuiet", "galeBusy", "areaBox"], phone: "idle", mite: ["Last ping 29 Aug · Last callout taken 19 Aug", "<b>2</b> pings last week"], gale: "Last ping 40 min ago" },
+  { title: "Kip asks for Meteor Mite to be tried",
+    text: "The next Eastgate callout that suits Meteor Mite goes to Meteor Mite first, ahead of The Gale. Click Next to see it arrive.",
+    show: ["miteQueued", "galeBusy", "areaBox"], phone: "idle", mite: ["Last ping 29 Aug · Last callout taken 19 Aug", "<b>2</b> pings last week"], gale: "Last ping 40 min ago",
+    log: "Kip asked for Meteor Mite to get the next suitable callout" },
+  { title: "A ping arrives on Meteor Mite's phone",
+    text: "It waits 60 seconds. The demo runs the clock 10× fast. Let it run out to see a timeout under the new rules, or tap 'Take it'.",
+    show: ["miteQueued", "galeBusy", "areaBox"], phone: "ping", speed: 100, mite: ["Last ping just now", "<b>2</b> pings last week"], gale: "Last ping 40 min ago" },
+  { title: "A timeout is not a 'no'",
+    text: "Today, this would cost Meteor Mite another 0.12 and push them further down the list. That's how 7 timeouts since 12 Aug took them to the bottom. Under the new rules, nothing is taken off, Meteor Mite stays first in line, and both Kip and Meteor Mite can see why the ping vanished.",
+    show: ["miteMissed", "galeBusy", "areaBox"], phone: "missed", mite: ["Last ping just now (timed out)", "<b>2</b> pings last week"], gale: "Last ping 40 min ago",
+    log: "Ping timed out after 60 s · not counted against Meteor Mite" },
+  { title: "The next Eastgate callout goes to Meteor Mite",
+    text: "This time the clock runs at real speed. Tap 'Take it'.",
+    show: ["miteMissed", "galeBusy", "areaBox"], phone: "ping", speed: 1000, mite: ["Last ping just now", "<b>2</b> pings last week"], gale: "Last ping 40 min ago" },
+  { title: "Meteor Mite is back, and The Gale gets a breather",
+    text: "Meteor Mite's warning clears on its own, and the Eastgate strip moves. One callout The Gale would have taken went to Meteor Mite instead. Kip has something better to tell both of them than 'hang in there'.",
+    show: ["miteTaken", "galeRelief", "areaBox"], phone: "taken", mite: ["Last ping just now · Last callout taken just now", "<b>3</b> pings this week"], gale: "Last ping 40 min ago",
+    log: "Meteor Mite took an Eastgate callout · The Gale didn't need to", taken: true },
+];
+
+const $ = id => document.getElementById(id);
+const panels = ["phoneIdle", "phonePing", "phoneMissed", "phoneTaken"];
+const alerts = ["miteQuiet", "miteQueued", "miteMissed", "miteTaken", "galeBusy", "galeRelief", "areaBox"];
+let i = 0, tick = null, left = 60;
+
+function show(n) {
+  i = Math.max(0, Math.min(steps.length - 1, n));
+  const s = steps[i];
+  clearInterval(tick);
+  $("stepNum").textContent = `Step ${i + 1} of ${steps.length}`;
+  $("stepTitle").textContent = s.title;
+  $("stepText").textContent = s.text;
+  $("back").disabled = i === 0;
+  $("next").disabled = [1, 3, 5, steps.length - 1].includes(i);
+  alerts.forEach(a => $(a).classList.toggle("hide", !s.show.includes(a)));
+  $("miteLast").textContent = s.mite[0];
+  $("miteStat").innerHTML = s.mite[1];
+  $("galeLast").textContent = s.gale;
+  $("areaTotal").textContent = s.taken ? 53 : 52;
+  $("areaMite").textContent = s.taken ? 4 : 3;
+  $("areaM").style.width = (s.taken ? 4 / 53 : 3 / 52) * 100 + "%";
+  $("areaG").style.width = (43 / (s.taken ? 53 : 52)) * 100 + "%";
+  $("log").innerHTML = steps.slice(0, i + 1).filter(x => x.log)
+    .map(x => `<li>${x.log}</li>`).reverse().join("");
+  panels.forEach(p => $(p).classList.add("hide"));
+  if (s.phone === "ping") startPing(s.speed);
+  else $({ idle: "phoneIdle", missed: "phoneMissed", taken: "phoneTaken" }[s.phone]).classList.remove("hide");
+}
+
+function startPing(speed) {
+  $("phonePing").classList.remove("hide");
+  left = 60; render();
+  $("timerHint").textContent = speed < 1000 ? "Demo: clock running 10× fast" : "Clock running at real speed";
+  tick = setInterval(() => {
+    left -= 1; render();
+    if (left <= 0) { clearInterval(tick); show(4); }
+  }, speed);
+}
+function render() { $("timer").textContent = left; $("bar").style.width = (left / 60 * 100) + "%"; }
+
+$("next").onclick = () => show(i + 1);
+$("back").onclick = () => show(i - 1);
+$("restart").onclick = () => show(0);
+$("sendNext").onclick = () => show(2);
+$("take").onclick = () => show(6);
+show(0);
+</script>
+</body>
+</html>
