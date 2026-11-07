@@ -2,6 +2,8 @@
 
 Draft for Helen · Dispatch PM · Nov 2026 · Not final: open questions at the bottom
 
+**Owner:** not decided yet. Helen to decide (the roadmap still lists Priya).
+
 ## The problem, told through one responder
 
 **Vesper** used to get about 12–14 pings a week and take most of them. Their
@@ -69,6 +71,13 @@ Mite took 3 (before 12 Aug: 64 and 48 of 118).
   and none have been answered.
 - No responder goes 5 days without a ping without their handler seeing a
   warning.
+- Halfmoon (about 11 → 8 pings a week) and Corporal Ashgrove (about
+  10 → 7) stop slipping and get back to their old levels.
+- The busiest responders come back toward their usual load, for example
+  The Gale from about 20 pings a week to about 13.
+- The "missed 2 pings in a row" warning: how we'd measure it depends on
+  the warning levels Sofia settles on (open question 4).
+- **By when:** not set yet (open question 8).
 
 ## Not doing
 - **Quietly changing one number.** Putting the wait back to 90 s alone would
@@ -86,8 +95,9 @@ Mite took 3 (before 12 Aug: 64 and 48 of 118).
 | 3 | Should the wait stay at 60 s? We have **no answer times**, so nobody knows how long real answers take. Can we start recording them? | Ravi, Wen |
 | 4 | Are 5 days and 2 misses the right warning levels? | Sofia, with handlers |
 | 5 | Wording and placement on the console and phone. | Sofia |
-| 6 | Who owns this? The roadmap still lists Priya. | Helen |
+| 6 | Who owns this? The roadmap still lists Priya (see Owner at the top). | Helen |
 | 7 | Baseline numbers before we ship. Bulk Callout shipped without one. | Ravi |
+| 8 | How soon after release should the measures above be met? | Helen, with Ravi |
 
 ## Risks
 - **The busiest responders lose some work.** The Gale and Nightwell picked
